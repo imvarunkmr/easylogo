@@ -4,7 +4,7 @@ Donate link: http://varunkmr.com/
 Tags: logo, effects, center logo, logo management
 Requires at least: 3.0.1
 Tested up to: 4.4.2
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,9 +22,12 @@ Multiple features are provided such as:
 
 * Uploading and using the retina version of your logo.
 
-To see some samples [visit the plugin support page ](http://plugins.imvarunkmr.net/easylogo/ "WordPress plugins by Varun")
+To see some samples [visit the plugin support page ](http://plugins.varunkmr.com/easylogo/ "WordPress plugins by Varun")
 
 == Changelog ==
+= 1.6 =
+* Added option to link logo to custom URL
+
 = 1.5 =
 * Added feature to center your logo
 * Bug fixes
@@ -44,6 +47,9 @@ To see some samples [visit the plugin support page ](http://plugins.imvarunkmr.n
 * Fixed compatibility issues with latest media uploader
 
 == Upgrade Notice ==
+= 1.6 =
+* Added option to link logo to custom URL
+
 = 1.5 =
 * Added feature to center your logo
 * Bug fixes
@@ -64,6 +70,7 @@ Upgrade if your media gallery buttons are no longer working after WordPress upgr
 == Screenshots ==
 
 1. This is the screenshot of main settings page of this plugin. You can customise the settings as per your convenience.
+2. An example for adding easylogo in twentysixteen theme.
 
 == Installation ==
 

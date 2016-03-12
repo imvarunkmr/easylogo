@@ -1,15 +1,14 @@
 <?php
 /*
 Plugin Name: Easy Logo
-Plugin URI: http://plugins.imvarunkmr.net/easylogo
+Plugin URI: http://plugins.varunkmr.com/easylogo
 Description: Upload logos on your WordPress sites and manage them easily
-Version: 1.5
+Version: 1.6
 Author: Varun Kumar
-Author URI: http://imvarunkmr.net
-License: GPLv2  
-*/
-?><?php
-/* Copyright 2014 VARUN KUMAR (email : imvarunkmr@gmail.com)
+Author URI: http://varunkmr.com
+License: GPLv2
+
+Copyright 2014 VARUN KUMAR (email : imvarunkmr@gmail.com)
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -22,7 +21,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
-?><?php
 
 add_action( 'admin_menu', 'elv_easylogo_add_settings_page' );
 /**
@@ -38,7 +36,7 @@ function elv_easylogo_add_settings_page() {
  * Retrieves plugin options if they exist or returns default values if not
  *
  * @since Easy Logo 1.0
- * 
+ *
  * @return array of Easy Logo options or default values
  */
 function elv_easylogo_get_options() {
@@ -49,19 +47,31 @@ function elv_easylogo_get_options() {
 		$elv_easylogo_options['retina_version'] = "";
 		$elv_easylogo_options['use_retina'] = 0;
 		$elv_easylogo_center['center'] = "";
+		$elv_easylogo_center['url'] = "";
+		$elv_easylogo_center['use_custom_url'] = "";
 	}
 	else {
 		$elv_easylogo_options = get_option( 'elv_easylogo_options' );
-		
+
 		// If the checkbox is unchecked for responisve logo
-		if( !isset( $elv_easylogo_options['responsive'] ) )
+		if( !isset( $elv_easylogo_options['responsive'] ) ){
 			$elv_easylogo_options['responsive'] = 0;
+		}
 		// If the checkbox is unchecked for retina version
-		if( !isset( $elv_easylogo_options['use_retina'] ) )
+		if( !isset( $elv_easylogo_options['use_retina'] ) ){
 			$elv_easylogo_options['use_retina'] = 0;
-		// If the checkbox is unchecked for retina version
-		if( !isset( $elv_easylogo_options['center'] ) )
+		}
+		// If the checkbox is unchecked for centering logo
+		if( !isset( $elv_easylogo_options['center'] ) ) {
 			$elv_easylogo_options['center'] = "";
+		}
+		// If checkbox is unchecked for URL
+		if( !isset( $elv_easylogo_options['use_custom_url'] ) ){
+			$elv_easylogo_options['use_custom_url'] = "";
+		}
+		if( !isset( $elv_easylogo_options['url'] ) ){
+			$elv_easylogo_options['url'] = esc_url( home_url( '/' ) );
+		}
 	}
 	return $elv_easylogo_options;
 }
@@ -93,31 +103,31 @@ add_action( 'admin_init', 'elv_easylogo_register_settings' );
  * @since Easy Logo 1.0
  */
 function elv_easylogo_register_settings(){
-	
+
 	/**
 	 * Registers Main setting for Easy Logo
 	 *
 	 */
 	register_setting( 'elv_easylogo_options', 'elv_easylogo_options', 'elv_easylogo_validate_options' );
-	
+
 	/**
-	 * Adds a settings section 
+	 * Adds a settings section
 	 *
 	 */
 	add_settings_section( 'elv_easylogo_main_section', 'Settings', 'elv_easylogo_text', 'elv_easylogo' );
-	
+
 	/**
-	 * Adds a setting field  for logo image selection 
+	 * Adds a setting field  for logo image selection
 	 *
 	 */
-	add_settings_field( 'elv_easylogo_image_path', 'Select Easy logo Image', 'elv_easylogo_image_path_input', 'elv_easylogo', 'elv_easylogo_main_section' );	
-	
+	add_settings_field( 'elv_easylogo_image_path', 'Select Easy logo Image', 'elv_easylogo_image_path_input', 'elv_easylogo', 'elv_easylogo_main_section' );
+
 	/**
 	 * Adds a setting field  for selecting the hover effect
 	 *
 	 */
 	add_settings_field( 'elv_easylogo_hover', 'Select Hover Effect', 'elv_easylogo_hover_select', 'elv_easylogo', 'elv_easylogo_main_section' );
-	
+
 	/**
 	 * Adds a setting field  for centering the logo
 	 *
@@ -129,12 +139,18 @@ function elv_easylogo_register_settings(){
 	 *
 	 */
 	add_settings_field( 'elv_easylogo_responsive', 'Make logo responsive?', 'elv_easylogo_responsive_select', 'elv_easylogo', 'elv_easylogo_main_section' );
-	
+
 	/**
 	 * Upload retina version of the image
 	 *
 	 */
-	add_settings_field( 'elv_easylogo_retina', 'Upload retina version', 'elv_easylogo_retina_version_upload', 'elv_easylogo', 'elv_easylogo_main_section' );	
+	add_settings_field( 'elv_easylogo_retina', 'Upload retina version', 'elv_easylogo_retina_version_upload', 'elv_easylogo', 'elv_easylogo_main_section' );
+
+	/**
+	 * Link logo to custom URL
+	 *
+	 */
+	add_settings_field( 'elv_easylogo_url', 'Link logo to custom URL', 'elv_easylogo_url', 'elv_easylogo', 'elv_easylogo_main_section' );
 }
 
 /**
@@ -153,7 +169,7 @@ function elv_easylogo_text() {
 /**
  * Displays text field for image URL
  *
- * Also displays a button to select image from media library 
+ * Also displays a button to select image from media library
  *
  * @since Easy Logo 1.0
  */
@@ -161,7 +177,7 @@ function elv_easylogo_image_path_input() {
 	$options = elv_easylogo_get_options();
 	$elv_easylogo_image = $options['image_path'];
 	$elv_easylogo_hover_effect = $options['hover'];
-	
+
 	/**
 	 * Markup for displaying text field and media library button
 	 *
@@ -174,19 +190,19 @@ function elv_easylogo_image_path_input() {
 }
 
 /**
- * Displays select box for choosing hover.css hover effect 
+ * Displays select box for choosing hover.css hover effect
  *
- * Also displays a button to select image from media library 
+ * Also displays a button to select image from media library
  *
  * @since Easy Logo 1.0
  */
-function elv_easylogo_hover_select(){ 
+function elv_easylogo_hover_select(){
 	$options = elv_easylogo_get_options();
 	$elv_easylogo_image = $options['image_path'];
 	$elv_easylogo_hover_effect = $options['hover'];
-	
+
 	/**
-	 * Markup for displaying the select box 
+	 * Markup for displaying the select box
 	 *
 	 */
 	?><p><select id="elv_select_hover_effect" name= "elv_easylogo_options[hover]">
@@ -234,7 +250,7 @@ function elv_easylogo_hover_select(){
 	</select></p>
 	<p class="description">Few recommended effects - Float Shadow, Shadow Radial, Curl-(any)</p>
 	<span style="line-height:0" id="easylogo-admin-preview-p" class="<?php echo $elv_easylogo_hover_effect; ?>">
-	<img id="elv_easylogo_admin_preview" src="<?php echo $elv_easylogo_image; ?>" alt="Logo" /></span><?php 
+	<img id="elv_easylogo_admin_preview" src="<?php echo $elv_easylogo_image; ?>" alt="Logo" /></span><?php
 }
 
 /**
@@ -246,7 +262,7 @@ function elv_easylogo_responsive_select() {
 	$options = elv_easylogo_get_options();
 	$elv_easylogo_is_responsive = $options['responsive'];
 	/**
-	 * Markup for displaying the select box 
+	 * Markup for displaying the select box
 	 *
 	 */
 	?><input name="elv_easylogo_options[responsive]" type="checkbox" value="true" <?php checked( $elv_easylogo_is_responsive, "true" ); ?> /> Yes
@@ -262,7 +278,7 @@ function elv_easylogo_center_select() {
 	$options = elv_easylogo_get_options();
 	$elv_easylogo_is_center = $options['center'];
 	/**
-	 * Markup for displaying the select box 
+	 * Markup for displaying the select box
 	 *
 	 */
 	?><input name="elv_easylogo_options[center]" type="checkbox" value="true" <?php checked( $elv_easylogo_is_center, "true" ); ?> /> Yes
@@ -270,7 +286,7 @@ function elv_easylogo_center_select() {
 }
 
 /**
- * Displays markup to allow users to upload retina version of their logo 
+ * Displays markup to allow users to upload retina version of their logo
  *
  * @since Easy Logo 1.0
  */
@@ -278,7 +294,7 @@ function elv_easylogo_retina_version_upload() {
 	$options = elv_easylogo_get_options();
 	$elv_easylogo_retina_version = $options['retina_version'];
 	$elv_easylogo_is_retina_checked = $options['use_retina'];
-	
+
 	/**
 	 * Markup for displaying text field and media library button
 	 *
@@ -293,20 +309,36 @@ function elv_easylogo_retina_version_upload() {
 }
 
 /**
+ * Displays markup to allow users to link logo to a different page
+ *
+ * @since Easy Logo 1.6
+ */
+function elv_easylogo_url() {
+	$options = elv_easylogo_get_options();
+	$elv_easylogo_url = $options['url'];
+	$elv_easylogo_is_url_checked = $options['use_custom_url'];
+	?><p><input type="checkbox" name="elv_easylogo_options[use_custom_url]" value="use_custom_url" <?php checked( $elv_easylogo_is_url_checked, "use_custom_url" ); ?> />Use following URL instead of linking to homepage</p>
+	<p>
+		<input id="elv_easy_logo_url" class="regular-text code" type="text" name="elv_easylogo_options[url]" value="<?php echo esc_url($elv_easylogo_url); ?>">
+	</p><?php
+}
+
+/**
  * Validates the form submission by user
  *
  * @since Easy Logo 1.0
  */
 function elv_easylogo_validate_options($input) {
-	
+
 	$input['image_path'] = esc_url( $input['image_path'] );
-	
-	return $input;	
+	$input['url'] = esc_url( $input['url'] );
+
+	return $input;
 }
 
 /**
  * This function displays the logo on the front end of the site
- * 
+ *
  * User needs to call this function inside his theme where he wants to display the logo
  *
  * @since Easy Logo 1.0
@@ -316,17 +348,18 @@ function show_easylogo() {
 	$elv_easylogo_image = $options['image_path'];
 	$elv_easylogo_hover_effect = $options['hover'];
 	$elv_easylogo_is_responsive = $options['responsive'];
+	$url = isset( $options['url'] ) ? $options['url'] : "";
 	if( 'true' === $options['center'] )
 		$elv_easylogo_center = 'style = "text-align: center" ';
 	else
 		$elv_easylogo_center = "";
 
-	
+
 	if( $elv_easylogo_image === "" ) { ?>
-		<h2 class="site-title easylogo" <?php echo $elv_easylogo_center ?>><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h2><?php 
+		<h2 class="site-title easylogo" <?php echo $elv_easylogo_center ?>><a href="<?php echo $url; ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h2><?php
 	}
 	else { ?>
-		<h2 class = "easylogo" <?php echo $elv_easylogo_center ?>><a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>">
+		<h2 class = "easylogo" <?php echo $elv_easylogo_center ?>><a href="<?php echo $url; ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>">
 			<span style = "line-height:0" class = "<?php echo $elv_easylogo_hover_effect; ?>">
 			<img src="<?php echo $elv_easylogo_image; ?>" alt="<?php bloginfo( 'name' ); ?>"
 			<?php if( $elv_easylogo_is_responsive == "true" ) {?> style = "max-width:100%" <?php } ?> />
@@ -357,13 +390,13 @@ function elv_easylogo_scripts_theme_only() {
 	 */
 	$options = elv_easylogo_get_options();
 	if( $options['use_retina'] === "use_retina" )
-		wp_enqueue_script( 'elv_easylogo_retina_js', plugins_url('/easylogo/js/retina.min.js'), array(), '', true );	
+		wp_enqueue_script( 'elv_easylogo_retina_js', plugins_url('/easylogo/js/retina.min.js'), array(), '', true );
 }
 
 add_action( 'admin_print_styles', 'elv_easylogo_styles_admin' );
 /**
  * enqueues 'Easy Logo' and 'WordPress thickbox' styles in admin and front end
- * 
+ *
  * Conditionaly checks and inserts hover.css if required
  *
  * @since Easy Logo 1.0
@@ -377,7 +410,7 @@ function elv_easylogo_styles_admin() {
 add_action( 'template_redirect', 'elv_easylogo_styles_front_end' );
 /**
  * enqueues hover.css in front end of website
- * 
+ *
  * Only inserts when user has selected some effects
  *
  * @since Easy Logo 1.0
