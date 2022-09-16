@@ -1,10 +1,10 @@
 === Easy Logo ===
 Contributors: (imvarunkmr)
-Donate link: http://varunkmr.com/
+Donate link: https://www.paypal.me/imvarunkmr
 Tags: logo, effects, center logo, logo management
 Requires at least: 3.0.1
-Tested up to: 4.4.2
-Stable tag: 1.6
+Tested up to: 5.7.2
+Stable tag: 1.9.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,9 +22,30 @@ Multiple features are provided such as:
 
 * Uploading and using the retina version of your logo.
 
-To see some samples [visit the plugin support page ](http://plugins.varunkmr.com/easylogo/ "WordPress plugins by Varun")
+To see some samples [visit the plugin support page ](https://easylogo.krew.tech/ "WordPress plugins by Varun")
 
 == Changelog ==
+
+= 1.9.2 =
+* Added new feature: Adjust logo width in responsive version
+* Tested upto WordPress 5.3.2
+
+= 1.9.1 =
+* Fixed bug in responsive logo settings where logo appears huge
+* Tested upto WordPress 4.7.4
+
+= 1.9 =
+* Fixed [user reported bug related to responsive logo in firefox](https://wordpress.org/support/topic/logo-not-responsive-on-firefox-mobile/)
+* Tested upto WordPress 4.7.3
+
+= 1.8 =
+* Fixed [user reported bug](https://wordpress.org/support/topic/getting-e-l-to-work-in-twenty-fourteen/)
+* Tested upto WordPress 4.6.1
+
+= 1.7 =
+* Fixed Undefined Index Notices
+* Updated Plugin header
+
 = 1.6 =
 * Added option to link logo to custom URL
 
@@ -75,11 +96,14 @@ Upgrade if your media gallery buttons are no longer working after WordPress upgr
 == Installation ==
 
 1. Open header.php file of your current theme.
-1. Paste `<?php show_easylogo(); ?>` where you want to display your logo.
-1. Please comment out your existing logo for future.
-
+2. Paste `<?php show_easylogo(); ?>` where you want to display your logo.
+3. Please comment out your existing logo for future.
 
 == Frequently Asked Questions ==
+
+= Why my logo appears so big? =
+
+If your logo appeears to be bigger than it needs to be, make sure to uncheck the "make logo responsive option" in settings
 
 = Will extra stylesheets will be added even if I don't select any hover effect? =
 

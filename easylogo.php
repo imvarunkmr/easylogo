@@ -1,12 +1,15 @@
 <?php
 /*
 Plugin Name: Easy Logo
-Plugin URI: http://plugins.varunkmr.com/easylogo
+Plugin URI: https://easylogo.krew.tech/
 Description: Upload logos on your WordPress sites and manage them easily
-Version: 1.6
+Version: 1.9.2
 Author: Varun Kumar
-Author URI: http://varunkmr.com
+Author URI: https://easylogo.krew.tech/
 License: GPLv2
+*/
+
+/* Plugin Licence
 
 Copyright 2014 VARUN KUMAR (email : imvarunkmr@gmail.com)
 This program is free software; you can redistribute it and/or modify
@@ -44,11 +47,13 @@ function elv_easylogo_get_options() {
 		$elv_easylogo_options['image_path'] = "";
 		$elv_easylogo_options['hover'] = "none";
 		$elv_easylogo_options['responsive'] = 0;
+		$elv_easylogo_options['max_logo_width'] = "100%";
 		$elv_easylogo_options['retina_version'] = "";
 		$elv_easylogo_options['use_retina'] = 0;
-		$elv_easylogo_center['center'] = "";
-		$elv_easylogo_center['url'] = "";
-		$elv_easylogo_center['use_custom_url'] = "";
+		$elv_easylogo_options['center'] = "";
+		$elv_easylogo_options['url'] = "/";
+		$elv_easylogo_options['use_custom_url'] = "";
+		
 	}
 	else {
 		$elv_easylogo_options = get_option( 'elv_easylogo_options' );
@@ -56,6 +61,10 @@ function elv_easylogo_get_options() {
 		// If the checkbox is unchecked for responisve logo
 		if( !isset( $elv_easylogo_options['responsive'] ) ){
 			$elv_easylogo_options['responsive'] = 0;
+		}
+		// If the user has set maximum logo width
+		if( !isset( $elv_easylogo_options['max_logo_width'] ) ){
+			$elv_easylogo_options['max_logo_width'] = "100%";
 		}
 		// If the checkbox is unchecked for retina version
 		if( !isset( $elv_easylogo_options['use_retina'] ) ){
@@ -69,8 +78,8 @@ function elv_easylogo_get_options() {
 		if( !isset( $elv_easylogo_options['use_custom_url'] ) ){
 			$elv_easylogo_options['use_custom_url'] = "";
 		}
-		if( !isset( $elv_easylogo_options['url'] ) ){
-			$elv_easylogo_options['url'] = esc_url( home_url( '/' ) );
+		if( $elv_easylogo_options['url'] == "" ){
+			$elv_easylogo_options['url'] = get_bloginfo('url');
 		}
 	}
 	return $elv_easylogo_options;
@@ -261,12 +270,14 @@ function elv_easylogo_hover_select(){
 function elv_easylogo_responsive_select() {
 	$options = elv_easylogo_get_options();
 	$elv_easylogo_is_responsive = $options['responsive'];
+	$elv_easylogo_max_logo_width = $options['max_logo_width'];
 	/**
 	 * Markup for displaying the select box
 	 *
 	 */
 	?><input name="elv_easylogo_options[responsive]" type="checkbox" value="true" <?php checked( $elv_easylogo_is_responsive, "true" ); ?> /> Yes
-	<p class="description">If you already use any responive design plugins, you may keep this option unchecked </p><?php
+	<p><input id="elv_easy_logo_max_logo_width" class="regular-text code" type="text" name="elv_easylogo_options[max_logo_width]" value="<?php echo esc_attr($elv_easylogo_max_logo_width); ?>"></p>
+	<p class="description">Max Logo Width (For example: 180px or 75% etc) </p><?php
 }
 
 /**
@@ -276,7 +287,7 @@ function elv_easylogo_responsive_select() {
  */
 function elv_easylogo_center_select() {
 	$options = elv_easylogo_get_options();
-	$elv_easylogo_is_center = $options['center'];
+	$elv_easylogo_is_center = isset($options['center']) ? $options['center'] : false ;
 	/**
 	 * Markup for displaying the select box
 	 *
@@ -315,8 +326,8 @@ function elv_easylogo_retina_version_upload() {
  */
 function elv_easylogo_url() {
 	$options = elv_easylogo_get_options();
-	$elv_easylogo_url = $options['url'];
-	$elv_easylogo_is_url_checked = $options['use_custom_url'];
+	$elv_easylogo_url = isset($options['url'])? $options['url'] : '';
+	$elv_easylogo_is_url_checked = isset($options['use_custom_url']) ? $options['use_custom_url'] : ''  ;
 	?><p><input type="checkbox" name="elv_easylogo_options[use_custom_url]" value="use_custom_url" <?php checked( $elv_easylogo_is_url_checked, "use_custom_url" ); ?> />Use following URL instead of linking to homepage</p>
 	<p>
 		<input id="elv_easy_logo_url" class="regular-text code" type="text" name="elv_easylogo_options[url]" value="<?php echo esc_url($elv_easylogo_url); ?>">
@@ -348,11 +359,14 @@ function show_easylogo() {
 	$elv_easylogo_image = $options['image_path'];
 	$elv_easylogo_hover_effect = $options['hover'];
 	$elv_easylogo_is_responsive = $options['responsive'];
+	$elv_easylogo_max_logo_width = $options['max_logo_width'];
 	$url = isset( $options['url'] ) ? $options['url'] : "";
-	if( 'true' === $options['center'] )
+	if( isset($options['center']) &&  $options['center'] == true) {
 		$elv_easylogo_center = 'style = "text-align: center" ';
-	else
+	}
+	else {
 		$elv_easylogo_center = "";
+	}
 
 
 	if( $elv_easylogo_image === "" ) { ?>
@@ -362,7 +376,7 @@ function show_easylogo() {
 		<h2 class = "easylogo" <?php echo $elv_easylogo_center ?>><a href="<?php echo $url; ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>">
 			<span style = "line-height:0" class = "<?php echo $elv_easylogo_hover_effect; ?>">
 			<img src="<?php echo $elv_easylogo_image; ?>" alt="<?php bloginfo( 'name' ); ?>"
-			<?php if( $elv_easylogo_is_responsive == "true" ) {?> style = "max-width:100%" <?php } ?> />
+			<?php if( $elv_easylogo_is_responsive === "true" ) {?> style = "max-width:<?php echo $elv_easylogo_max_logo_width; ?>; width: 100%" <?php } ?> />
 			</span></a></h2><?php
 	}
 }
